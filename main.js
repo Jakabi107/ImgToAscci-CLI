@@ -139,6 +139,6 @@ if (output) {
   return 0
 }
 else {
-  throw new Error("\x1b[4m\x1b[31mNo data received - write -h flag or go to -link- to see args \x1b[0m");
+  throw new Error("\x1b[4m\x1b[31mNo data received - write -h flag or go to https://github.com/Jakabi107/ImgToAscci-CLI to see args \x1b[0m");
 }
 
