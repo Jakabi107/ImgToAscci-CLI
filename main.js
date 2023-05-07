@@ -77,7 +77,7 @@ const createDescription = () => (
         raw: true
       },
       {
-        content: "Project home: {blue {underline insertLink}} \nAuthors: Jakabi",
+        content: "Project home: {blue {underline https://github.com/Jakabi107/ImgToAscci-CLI}} \nAuthors: Jakabi",
       }
     ]),
 
