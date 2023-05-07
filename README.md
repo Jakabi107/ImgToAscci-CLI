@@ -30,6 +30,7 @@ You can check if it's the right path wih `pwd`.
 
 ### Tasks:
 
+- [ ] Add example 
 - [ ] Reverse Brightness Feature 
 - [ ] Scale
 - [ ] Implementation Converter eg. jpg -> bmp
