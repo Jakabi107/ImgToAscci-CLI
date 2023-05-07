@@ -1,0 +1,22 @@
+{
+  "name": "asii_art_package",
+  "version": "1.0.0",
+  "description": "Generates an img out of ascci characters (-text file) from a bmp file.",
+  "main": "main.js",
+  "bin": {
+    "asciiart": "main.js"
+  },
+  "keywords": [
+    "cli",
+    "ascii_art",
+    "ascii",
+    "art"
+  ],
+  "author": "Jakabi107",
+  "license": "ISC",
+  "dependencies": {
+    "command-line-args": "^5.2.1",
+    "command-line-usage": "^7.0.1",
+    "yargs": "^17.7.2"
+  }
+}
