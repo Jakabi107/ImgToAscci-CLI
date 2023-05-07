@@ -12,7 +12,7 @@ A CL tool wich allowes you to convert an image (by the time only a bmp) to an st
  + Open the terminal. First you have to navigate via `cd <path>` into the *dir* or open it in a **code editor** like VS-Code-2 and use the build in *Terminal implementation*. Usally that should dierect you dierctly in the opened dir.  
 You can check if it's the right path wih `pwd`.
 
- + Now install all used packages and libaries via `npm install ./package.json`.
+ + Now install all used packages and libaries via `npm install`.
  
  + From now on you can just write `node main.js <args>` and run the programm
  > When your not in the *dir* - write `node <path of main.js> <args>`
