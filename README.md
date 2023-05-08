@@ -4,7 +4,7 @@
 A CL tool wich allows you to convert an image (by the time only a bmp) to a string of ascii characters, seen in a Monospace font, looks like the img. 
 
 ---
-### Installation:
+## Installation:
 > **Note:** I will update it to access it via command.
 
 > You need to have installed [node.js](https://nodejs.org/en/download) and [npm](https://docs.npmjs.com/about-npm) which normally is preinstalled with node.
@@ -22,13 +22,47 @@ You can check if it's the right path with `pwd`.
 
 ---
 
-### Documentation:
+## Documentation:
 
   > **Note:** Under construction
-  
+
+---
+### Example:
+
+Example convertation:
+> with the included preview file
+
+**Input**:
+
+<img src="https://user-images.githubusercontent.com/117978218/236807155-635e73eb-2588-49d9-8f7f-7416b10859fb.jpg" height="280">
+
+> File [preview.bmp](https://github.com/Jakabi107/ImgToAscci-CLI/blob/main/preview.bmp)
+
+```
+ % node main.js -f preview.bmp -o preview.txt
+```
+
+**Output**
+
+Should stout data of *bmp* and write the output into *preview.txt*.
+> Could be you see no change because *preview.text* is already processed included in the *Zip*, just write another output path (`-o <new path>`) to see a difference.
+
+<details><summary>Result-Preview:</summary>
+<p>
+ <img src="https://user-images.githubusercontent.com/117978218/236812141-331dfbe3-239b-499a-af3c-5c912d5f1843.png" height="280">
+</p>
+</details> 
+
+>Hidden cause flickering while scrolling
+
+
+>File [preview.text](https://github.com/Jakabi107/ImgToAscci-CLI/blob/main/preview.text)
+
+
+
 ---
 
-### Tasks:
+## Tasks:
 
 - [ ] Add example 
 - [ ] Reverse Brightness Feature 
