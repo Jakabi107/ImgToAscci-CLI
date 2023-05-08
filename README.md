@@ -4,7 +4,7 @@
 A CL tool wich allows you to convert an image (by the time only a bmp) to a string of ascii characters, seen in a Monospace font, looks like the img. 
 
 ---
-## Installation:
+# Installation:
 > **Note:** I will update it to access it via command.
 
 + `%npm install` in zip folder
@@ -16,17 +16,17 @@ A CL tool wich allows you to convert an image (by the time only a bmp) to a stri
 
 ---
 
-## Documentation:
+
+# Documentation:
 
   > **Note:** Under construction
 
----
-### Example:
+## Example:
 
 Example convertation:
 > with the included preview file
 
-**Input**:
+### Input:
 
 <img src="https://user-images.githubusercontent.com/117978218/236807155-635e73eb-2588-49d9-8f7f-7416b10859fb.jpg" height="280">
 
@@ -36,7 +36,7 @@ Example convertation:
  % node main.js -f preview.bmp -o preview.txt
 ```
 
-**Output**
+### Output
 
 Should stout data of *bmp* and write the output into *preview.txt*.
 
