@@ -7,17 +7,11 @@ A CL tool wich allows you to convert an image (by the time only a bmp) to a stri
 ## Installation:
 > **Note:** I will update it to access it via command.
 
-> You need to have installed [node.js](https://nodejs.org/en/download) and [npm](https://docs.npmjs.com/about-npm) which normally is preinstalled with node.
++ `%npm install` in zip folder
 
- + Open the terminal. First you have to navigate via `cd <path>` into the *dir* or open it in a **code editor** like VS-Code-2 and use the build in *Terminal implementation*. Usally that should direct you directly in the opened dir.  
-You can check if it's the right path with `pwd`.
++ `%node main.js <args>`
 
- + Now install all used packages and libraries via `npm install`.
- 
- + From now on you can just write `node main.js <args>` and run the programm
- > When your not in the *dir* - write `node <path of main.js> <args>`
- 
- + Write `node main.js -h`to see all arguments and meanings
+    - Flag `-h` to view usage
 
 
 ---
@@ -57,23 +51,6 @@ Should stout data of *bmp* and write the output into *preview.txt*.
 
 
 >File [preview.text](https://github.com/Jakabi107/ImgToAscci-CLI/blob/main/preview.text)
-
-
-
----
-
-## Tasks:
-
-- [ ] Add example 
-- [ ] Reverse Brightness Feature 
-- [ ] Scale
-- [ ] Implementation Converter eg. jpg -> bmp
-- [ ] Docs
-- [ ] Proper *rdin/rdout*
-- [ ] Pipeline Interface
-- [ ] Warning to high size
-- [ ] Acceppt Buffer Data/file data
-
 
 
 ---
