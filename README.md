@@ -39,7 +39,6 @@ Example convertation:
 **Output**
 
 Should stout data of *bmp* and write the output into *preview.txt*.
-> Could be you see no change because *preview.text* is already processed included in the *Zip*, just write another output path (`-o <new path>`) to see a difference.
 
 <details><summary>Result-Preview:</summary>
 <p>
