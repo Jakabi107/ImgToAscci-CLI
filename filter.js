@@ -99,7 +99,9 @@ function pixelBrightness (pixel) {
 
 
 function brightToLetter(brightness, range, base, LETTER_PALETTE){
-    return LETTER_PALETTE[ Math.floor((brightness - base)/range) ];
+    let pos = Math.floor((brightness - base) / range);
+    if (pos == LETTER_PALETTE.length) pos = LETTER_PALETTE.length -1;
+    return LETTER_PALETTE[pos]
 }
 
 
