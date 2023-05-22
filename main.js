@@ -140,7 +140,7 @@ if (output) {
     console.log("Successfully written:", options.out);
   })
 
-  else console.log(output, "\n");
+  else process.stdout.write(output);
 
   return 0
 }
