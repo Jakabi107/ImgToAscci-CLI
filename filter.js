@@ -1,10 +1,10 @@
-function ascciArtFromFile (bf, PALATTE, LETTERS_PER_PIXEL){
+function ascciArtFromFile (bf, PALATTE, LETTERS_PER_PIXEL, log = false){
 
     let data = getBmpData(bf);
-    console.log("Bit-Format: " + data.bitsPerPixel + "-bit");
+    if (log) console.log("Bit-Format: " + data.bitsPerPixel + "-bit");
     let bitmap = getBitmap(bf, data);
     let bitmapRGBA = getBitmapSorted(bitmap, data);
-    console.log(data);
+    if (log) console.log(data);
     return bitmapRGBAToText(bitmapRGBA, PALATTE, LETTERS_PER_PIXEL);
 }
 

@@ -36,7 +36,13 @@ const optionDefinitions = [
     defaultValue: 1,
     type: Number,
     typeLabel: "{underline int}",
-    description: "How many {green letters} used {green per Pixel} \n Recommended to set it greater than 1 when higher than wide"
+    description: "How many {green letters} used {green per Pixel} \n Recommended to set it greater than 1 when higher than wide \n"
+  },
+  {
+    name: "log",
+    alias: "l",
+    type: Boolean,
+    description: "Logs some {green data} of the bitmap"
   }
 ];
 
@@ -115,7 +121,7 @@ if (fs.existsSync(options.file)) {
   fData = fs.readFileSync(options.file);
 
   if (fData.toString("ascii", 0, 2) == "BM") {
-    output = filter.ascciArtFromFile(fData, options.pallete, options.letters_per_pixel).join("\n");
+    output = filter.ascciArtFromFile(fData, options.pallete, options.letters_per_pixel, options.log).join("\n");
   }
   else {
     //isn't a bmp
