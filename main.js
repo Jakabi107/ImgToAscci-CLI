@@ -19,6 +19,12 @@ const optionDefinitions = [
     description: "The path of the {green input file}"
   },
   {
+    name: "data",
+    alias: "d",
+    type:String,
+    description: "Reads pure data (Bits) - file is prioritized"
+  },
+  {
     name: "out",
     alias: "o",
     description: "The path of the {green output file} - else in stdout\n"
@@ -110,27 +116,42 @@ if (options.help) {
 
 
 // in
-
+console.log(options)
 
 // processing
 let output;
 
 let fData;
 
-if (fs.existsSync(options.file)) {
-  fData = fs.readFileSync(options.file);
+if (options.file){
 
-  if (fData.toString("ascii", 0, 2) == "BM") {
-    output = filter.ascciArtFromFile(fData, options.pallete, options.letters_per_pixel, options.log).join("\n");
+  if (fs.existsSync(options.file)) {
+
+    fData = fs.readFileSync(options.file);
+  
+    if (fData.toString("ascii", 0, 2) == "BM") {
+      output = filter.ascciArtFromFile(fData, options.pallete, options.letters_per_pixel, options.log).join("\n");
+    }
+    else {
+      //convert to bmp?
+      //isn't a bmp
+    }
+
   }
   else {
-    //isn't a bmp
+    //no file
+
   }
+
+} 
+else if (options.data){
+  //data from data
 
 }
 else {
-  //no file
+  throw new Error("\x1b[4m\x1b[31mNo data received - write -h flag or go to https://github.com/Jakabi107/ImgToAscci-CLI to see args \x1b[0m");
 }
+
 
 
 // output
@@ -144,7 +165,5 @@ if (output) {
 
   return 0
 }
-else {
-  throw new Error("\x1b[4m\x1b[31mNo data received - write -h flag or go to https://github.com/Jakabi107/ImgToAscci-CLI to see args \x1b[0m");
-}
+
 //Hello world
