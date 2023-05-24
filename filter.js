@@ -10,13 +10,14 @@ function ascciArtFromFile (bf, PALATTE, LETTERS_PER_PIXEL, log = false){
 
 
 function ascciArtFromLine (bf, PALATTE, LETTERS_PER_PIXEL){
+
     let data = {
         width:Number.POSITIVE_INFINITY,
         height:1
     };
 
     let bitmapRGBA = getBitmapSorted(bf, data);
-    return bitmapRGBAToText(bitmapRGBA, PALATTE, LETTERS_PER_PIXEL);
+    return bitmapRGBAToText(bitmapRGBA, PALATTE, LETTERS_PER_PIXEL)[0];
 }
 
 
@@ -108,6 +109,5 @@ function brightToLetter(brightness, range, base, LETTER_PALETTE){
 
 module.exports = {
     "ascciArtFromFile":ascciArtFromFile,
-    "ascciArtFromLine":ascciArtFromLine,
-    "ascciArtFromData":()=>{}
+    "ascciArtFromLine":ascciArtFromLine
 }

@@ -5,6 +5,7 @@ const fs = require("fs");
 
 const filter = require("./filter.js")
 
+
 //options
 const optionDefinitions = [
   {
@@ -107,7 +108,6 @@ const createDescription = () => (
   }
 )
 
-
 if (options.help) {
   let description = createDescription();
   console.log(description.usage)
@@ -115,55 +115,76 @@ if (options.help) {
 }
 
 
-// in
-console.log(options)
 
-// processing
-let output;
 
-let fData;
+function main(options){
 
-if (options.file){
+  let data = readData(options);
+  let output = processData(options, data);
 
-  if (fs.existsSync(options.file)) {
+  //stdout
+  if (options.out) fs.writeFile(options.out, output.result, "ascii", (err) => {
+    if (err) throw err;
+    process.stdout.write(options.out);
+  })
+  else process.stdout.write(output.result);
+}
 
-    fData = fs.readFileSync(options.file);
+
+class dataOutput {
+  buffer;
+  isFile = false;
+  isBmp = false;
+}
+
+function readData(options){
+  let output = new dataOutput();
   
-    if (fData.toString("ascii", 0, 2) == "BM") {
-      output = filter.ascciArtFromFile(fData, options.pallete, options.letters_per_pixel, options.log).join("\n");
-    }
-    else {
-      //convert to bmp?
-      //isn't a bmp
-    }
+  if (fs.existsSync(options.file)) {
+    output.buffer = fs.readFileSync(options.file);
+    output.isFile = true;
+  } 
+  else if (options.file){
+    //pure data from -f
+    output.buffer = new Buffer.from(options.file);
+  } 
+  else if (options.data){
+    //pure data from -d
+    output.buffer = new Buffer.from(options.data);
+  }
+  else{
+    throw new Error("\x1b[4m\x1b[31mInputed data is not valid\x1b[0m");
+  }
 
+  //check if BMP
+  output.isBmp = (output.buffer.toString("ascii", 0, 2) == "BM")
+
+
+  return output;
+}
+
+
+class processedOutput {
+  result;
+}
+
+function processData(options, data){
+
+  let output = new processedOutput();
+
+  if (data.isBmp){
+    output.result = filter.ascciArtFromFile(data.buffer, options.pallete, options.letters_per_pixel, options.log).join("\n");
+  }
+  else if (data.isFile){
+    //Note: convert
+    throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m")
   }
   else {
-    //no file
-
+    output.result = filter.ascciArtFromLine(data.buffer, options.pallete, options.letters_per_pixel);
   }
 
-} 
-else if (options.data){
-  //data from data
-
-}
-else {
-  throw new Error("\x1b[4m\x1b[31mNo data received - write -h flag or go to https://github.com/Jakabi107/ImgToAscci-CLI to see args \x1b[0m");
+  return output
 }
 
 
-
-// output
-if (output) {
-  if (options.out) fs.writeFile(options.out, output, "ascii", (err) => {
-    if (err) throw err;
-    console.log("Successfully written:", options.out);
-  })
-
-  else process.stdout.write(output);
-
-  return 0
-}
-
-//Hello world
+main(options)
