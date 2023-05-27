@@ -105,7 +105,7 @@ if (options.help) {
 }
 
 
-interface DataOutput {
+interface RawFormat {
   buffer?:Buffer;
   isFile?:Boolean;
   isBmp?:Boolean;
@@ -114,7 +114,7 @@ interface DataOutput {
 
 class Data {
 
-  private _raw:DataOutput = this.readData();
+  private _raw:RawFormat = this.readData();
 
   get raw () {
     return this._raw;
@@ -143,9 +143,9 @@ class Data {
   
   
 
-  public readData():DataOutput {
+  public readData():RawFormat {
 
-    let output:DataOutput = {};
+    let output:RawFormat = {};
 
     if (fs.existsSync(this.options.file)) {
       output.buffer = fs.readFileSync(this.options.file);
