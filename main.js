@@ -58,8 +58,7 @@ var optionDefinitions = [
 ];
 var options = commandLineArgs(optionDefinitions);
 // -h
-var banner = String.raw(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n    ___  ________  ___  __    ________  ________  ___     \n   |  |   __  |  |   |   __  |   __  |      \n         |     /  /|   |     | /      \n __        __      ___      __      __       \n|  \\_           \\            |      \n ________ __ __ __\\ __ __ __ _______ __ |________||__||__||__| |__||__||__||_______||__|                                             \n\n"], ["\n    ___  ________  ___  __    ________  ________  ___     \n   |\\  \\|\\   __  \\|\\  \\|\\  \\ |\\   __  \\|\\   __  \\|\\  \\    \n   \\ \\  \\ \\  \\|\\  \\ \\  \\/  /|\\ \\  \\|\\  \\ \\  \\|\\ /\\ \\  \\   \n __ \\ \\  \\ \\   __  \\ \\   ___  \\ \\   __  \\ \\   __  \\ \\  \\  \n|\\  \\\\_\\  \\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\  \\ \\  \\ \\  \\|\\  \\ \\  \\ \n\\ \\________\\ \\__\\ \\__\\ \\__\\\\ \\__\\ \\__\\ \\__\\ \\_______\\ \\__\\\n \\|________|\\|__|\\|__|\\|__| \\|__|\\|__|\\|__|\\|_______|\\|__|                                             \n\n"])));
-console.log(banner.replace("\\", "\\\\"));
+var banner = String.raw(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n    ___  ________  ___  __    ________  ________  ___     \n   |  |   __  |  |   |   __  |   __  |      \n         |     /  /|   |     | /      \n __        __      ___      __      __       \n|  \\_           \\            |      \n ________ __ __ __\\ __ __ __ _______ __ |________||__||__||__| |__||__||__||_______||__|                                             \n\n"], ["\n    ___  ________  ___  __    ________  ________  ___     \n   |\\  \\|\\   __  \\|\\  \\|\\  \\ |\\   __  \\|\\   __  \\|\\  \\    \n   \\ \\  \\ \\  \\|\\  \\ \\  \\/  /|\\ \\  \\|\\  \\ \\  \\|\\ /\\ \\  \\   \n __ \\ \\  \\ \\   __  \\ \\   ___  \\ \\   __  \\ \\   __  \\ \\  \\  \n|\\  \\\\_\\  \\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\  \\ \\  \\ \\  \\|\\  \\ \\  \\ \n\\ \\________\\ \\__\\ \\__\\ \\__\\\\ \\__\\ \\__\\ \\__\\ \\_______\\ \\__\\\n \\|________|\\|__|\\|__|\\|__| \\|__|\\|__|\\|__|\\|_______|\\|__|                                             \n\n"]))).split("\\").join("\\\\");
 //the usage guide when flag -h/--help
 var createDescription = function () { return ({
     usage: commandLineUsage([
@@ -83,8 +82,7 @@ var createDescription = function () { return ({
         {
             content: "Project home: {blue {underline https://github.com/Jakabi107/ImgToAscci-CLI}} \nAuthors: Jakabi",
         }
-    ]),
-    logo: String.raw(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n\n     ___  ________  ___  __    ________  ________  ___     \n    |  |   __  |  |   |   __  |   __  |      \n          |     /  /|   |     | /      \n __         __      ___      __      __       \n |  \\_           \\            |      \n  ________ __ __ __\\ __ __ __ _______ __  |________||__||__||__| |__||__||__||_______||__|                                             \n\n"], ["\n\n     ___  ________  ___  __    ________  ________  ___     \n    |\\  \\|\\   __  \\|\\  \\|\\  \\ |\\   __  \\|\\   __  \\|\\  \\    \n    \\ \\  \\ \\  \\|\\  \\ \\  \\/  /|\\ \\  \\|\\  \\ \\  \\|\\ /\\ \\  \\   \n __  \\ \\  \\ \\   __  \\ \\   ___  \\ \\   __  \\ \\   __  \\ \\  \\  \n |\\  \\\\_\\  \\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\  \\ \\  \\ \\  \\|\\  \\ \\  \\ \n \\ \\________\\ \\__\\ \\__\\ \\__\\\\ \\__\\ \\__\\ \\__\\ \\_______\\ \\__\\\n  \\|________|\\|__|\\|__|\\|__| \\|__|\\|__|\\|__|\\|_______|\\|__|                                             \n\n"])))
+    ])
 }); };
 if (options.help) {
     var description = createDescription();
@@ -158,8 +156,9 @@ var Data = /** @class */ (function () {
     };
     return Data;
 }());
-new Data(options).printOut();
-var templateObject_1, templateObject_2;
+var mainD = new Data(options);
+mainD.printOut();
+var templateObject_1;
 // if (!options.file && !options.data) process.stdin.on("data", data => {
 //   options.file = data.toString();
 //   console.log(fs.existsSync(options.file))
