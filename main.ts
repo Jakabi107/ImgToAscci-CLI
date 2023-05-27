@@ -4,8 +4,7 @@ import * as commandLineUsage from 'command-line-usage';
 import * as fs from 'fs';
 import { Buffer } from 'buffer';
 
-import * as filter from "./filter.js";
-
+import * as filter from './filter';
 
 //options
 const optionDefinitions = [
@@ -176,14 +175,14 @@ class Data {
     let output = {result:""};
   
     if (this._raw.isBmp){
-      output.result = filter.ascciArtFromFile(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel, this.options.log).join("\n");
+      output.result = filter.default.ascciArtFromFile(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel, this.options.log).join("\n");
     }
     else if (this._raw.isFile){
       //Note: convert
       throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m")
     }
     else {
-      output.result = filter.ascciArtFromLine(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel);
+      output.result = filter.default.ascciArtFromLine(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel);
     }
   
     return output
