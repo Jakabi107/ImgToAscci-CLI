@@ -119,7 +119,7 @@ class Data {
     return this._raw;
   } 
 
-  private _out:{result:String} = this.toString();
+  private _out:{result:string} = this.toString();
 
   get out () {
     return this._out;
@@ -170,7 +170,7 @@ class Data {
   }
 
 
-  public toString():{result:String}{
+  public toString():{result:string}{
 
     let output = {result:""};
   

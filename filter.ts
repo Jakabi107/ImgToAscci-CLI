@@ -1,36 +1,118 @@
-function ascciArtFromFile (bf, PALATTE, LETTERS_PER_PIXEL, log = false){
+interface DataFormat {
+    fSize?:number;
+    dataOffset?:number;
+    bitsPerPixel?:number;
+    bmSize?:number;
+    width:number;
+    height:number;
+}
+
+
+interface PixelFormat {
+    b:number;
+    g:number;
+    r:number;
+    alpha:number;
+}
+
+
+interface Input {
+    bf: Buffer;
+    pallate: string;
+    lettersPerPixel:number;
+}
+
+
+class Main {
+    
+    constructor (private input:Input) {
+    
+    }
+
+    //varibles
+    private _data:DataFormat = {
+        width:Number.POSITIVE_INFINITY,
+        height:1
+    }
+
+    get data ():DataFormat{
+        return this.data;
+    }
+
+    private _rawBmp = this.input.bf;
+
+
+
+    // ---
+    private getBitmapSorted(){
+
+        let getPixel = (i):PixelFormat =>{
+            let rawPix = this._rawBmp.subarray(i*4, (i+1)*4);
+
+            return {
+                b:rawPix.readUInt8(0),
+                g:rawPix.readUInt8(1),
+                r:rawPix.readUInt8(2),
+                alpha:rawPix.readUInt8(3)
+            };
+        };
+
+        let row:[PixelFormat] = [getPixel(0)];
+        let bitmapRGBA:[[PixelFormat]] = [row];
+
+        
+        for(let i = 1; i < this._rawBmp.length/4; i++) {
+
+            let pixel = getPixel(i);
+
+            if (i % this._data.width == 0){
+                bitmapRGBA[Math.floor(i / this._data.width)] = row;
+                row = [pixel];
+            }  
+            else {
+                row.push(pixel);
+            }
+        };
+    
+        return bitmapRGBA;
+    }
+
+    // private getBmpData():BmpDataFormat {
+
+    //     return {
+    //         fSize: this.input.bf.readInt32LE(2),
+    //         dataOffset: this.input.bf.readInt32LE(10),
+    //         width: this.input.bf.readInt32LE(18),
+    //         height: Math.abs(this.input.bf.readInt32LE(22)),
+    //         bitsPerPixel: Math.abs(this.input.bf.readInt32LE(28)),
+    //         bmSize: this.input.bf.readUInt32LE(34)
+    //     } 
+    // }
+
+
+}
+
+
+function ascciArtFromFile (bf, palatte, lettersPerPixel, log = false){
 
     let data = getBmpData(bf);
     if (log) console.log("Bit-Format: " + data.bitsPerPixel + "-bit");
     let bitmap = getBitmap(bf, data);
     let bitmapRGBA = getBitmapSorted(bitmap, data);
     if (log) console.log(data);
-    return bitmapRGBAToText(bitmapRGBA, PALATTE, LETTERS_PER_PIXEL);
+    return bitmapRGBAToText(bitmapRGBA, palatte, lettersPerPixel);
 }
 
 
-function ascciArtFromLine (bf, PALATTE, LETTERS_PER_PIXEL){
+function ascciArtFromLine (bf, pallatte, lettersPerPixel){
 
-    let data = {
-        width:Number.POSITIVE_INFINITY,
-        height:1
-    };
+    // let data = {
+    //     width:number.POSITIVE_INFINITY,
+    //     height:1
+    // };
 
     let bitmapRGBA = getBitmapSorted(bf, data);
-    return bitmapRGBAToText(bitmapRGBA, PALATTE, LETTERS_PER_PIXEL)[0];
-}
-
-
-
-function getBmpData (bf) {
-    return {
-        fSize:bf.readInt32LE(2),
-        dataOffset:bf.readInt32LE(10),
-        width:bf.readInt32LE(18),
-        height:Math.abs(bf.readInt32LE(22)),
-        bitsPerPixel:Math.abs(bf.readInt32LE(28)),
-        bmSize:bf.readUInt32LE(34)
-    }
+    return bitmapRGBAToText(bitmapRGBA, pallatte, lettersPerPixel)[0];
 }
 
 
@@ -39,31 +121,8 @@ function getBitmap (bf, data) {
 }
 
 
-function getBitmapSorted(bitmap, data){
-    var bitmapRGBA:[any] = [[]];
 
-    for(let i = 0; i < bitmap.length/4; i++) {
-        //sorting every time new arr when new line
-        //(eg. width = 12; i = 24 (25. zeichen) -> i mod 12 == 0 -> neue Zeile!!)
-        if (i % data.width == 0) bitmapRGBA.push([]);
-
-        let pixel = bitmap.subarray(i*4, (i+1)*4);
-        
-        bitmapRGBA[bitmapRGBA.length - 1].push(
-            {
-                b:pixel.readUInt8(0),
-                g:pixel.readUInt8(1),
-                r:pixel.readUInt8(2),
-                alpha:pixel.readUInt8(3)
-            }
-        )
-    };
-
-    return bitmapRGBA;
-}
-
-
-function bitmapRGBAToText(bitmapRGBA, LETTER_PALETTE, LETTERS_PER_PIXEL){
+function bitmapRGBAToText(bitmapRGBA, pallate, lettersPerPixel){
 
     let highest = -1;
     let lowest = 256;
@@ -77,17 +136,17 @@ function bitmapRGBAToText(bitmapRGBA, LETTER_PALETTE, LETTERS_PER_PIXEL){
         });
     });
 
-    let range = (highest - lowest)/LETTER_PALETTE.length;
+    let range = (highest - lowest)/pallate.length;
 
 
     //remove for fit range
-    range = 255/LETTER_PALETTE.length;
+    range = 255/pallate.length;
     lowest = 0;
 
     return brightMap.map(row =>{
         return row.map(pixelBr => {
-            let letter = brightToLetter(pixelBr, range, lowest, LETTER_PALETTE);
-            return Array(LETTERS_PER_PIXEL).fill(letter).join("");
+            let letter = brightToLetter(pixelBr, range, lowest, pallate);
+            return Array(lettersPerPixel).fill(letter).join("");
         }).join("");
     });
 }
@@ -99,10 +158,10 @@ function pixelBrightness (pixel) {
 }
 
 
-function brightToLetter(brightness, range, base, LETTER_PALETTE){
+function brightToLetter(brightness, range, base, pallate){
     let pos = Math.floor((brightness - base) / range);
-    if (pos == LETTER_PALETTE.length) pos = LETTER_PALETTE.length -1;
-    return LETTER_PALETTE[pos]
+    if (pos == pallate.length) pos = pallate.length -1;
+    return pallate[pos]
 }
 
 
