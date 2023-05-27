@@ -187,4 +187,9 @@ function processData(options, data){
 }
 
 
-main(options)
+if (!options.file && !options.data) process.stdin.on("data", data => {
+  options.file = data.toString();
+  console.log(fs.existsSync(options.file))
+  main(options)
+})
+else main(options);
