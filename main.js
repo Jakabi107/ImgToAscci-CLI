@@ -1,195 +1,168 @@
 #! usr/bin/env node
-const commandLineArgs = require("command-line-args");
-const commandLineUsage = require('command-line-usage')
-const fs = require("fs");
-
-const filter = require("./filter.js")
-
-
+"use strict";
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var commandLineArgs = require("command-line-args");
+var commandLineUsage = require("command-line-usage");
+var fs = require("fs");
+var buffer_1 = require("buffer");
+var filter = require("./filter.js");
 //options
-const optionDefinitions = [
-  {
-    name: "help",
-    alias: "h",
-    type: Boolean,
-    description: "Usage guide"
-  },
-  {
-    name: "file",
-    alias: "f",
-    description: "The path of the {green input file}"
-  },
-  {
-    name: "data",
-    alias: "d",
-    type:String,
-    description: "Reads pure data (Bits) - file is prioritized"
-  },
-  {
-    name: "out",
-    alias: "o",
-    description: "The path of the {green output file} - else in stdout\n"
-  },
-  {
-    name: "pallete",
-    defaultValue: " .'^<?(tuQ0mdp*#MB@",
-    type: String,
-    description: "{green Pallette} of {italic ascci} charakters - lite to dark  \nUse {green {underline \\\\ }} to insert {green spaces} \n",
-    typeLabel: "\"{underline .'^<?(tuQ0mdp*#MB@}\""
-  },
-  {
-    name: "letters_per_pixel",
-    alias: "w",
-    defaultValue: 1,
-    type: Number,
-    typeLabel: "{underline int}",
-    description: "How many {green letters} used {green per Pixel} \n Recommended to set it greater than 1 when higher than wide \n"
-  },
-  {
-    name: "log",
-    alias: "l",
-    type: Boolean,
-    description: "Logs some {green data} of the bitmap"
-  }
+var optionDefinitions = [
+    {
+        name: "help",
+        alias: "h",
+        type: Boolean,
+        description: "Usage guide"
+    },
+    {
+        name: "file",
+        alias: "f",
+        description: "The path of the {green input file}"
+    },
+    {
+        name: "data",
+        alias: "d",
+        type: String,
+        description: "Reads pure data (Bits) - file is prioritized"
+    },
+    {
+        name: "out",
+        alias: "o",
+        description: "The path of the {green output file} - else in stdout\n"
+    },
+    {
+        name: "pallete",
+        defaultValue: " .'^<?(tuQ0mdp*#MB@",
+        type: String,
+        description: "{green Pallette} of {italic ascci} charakters - lite to dark  \nUse {green {underline \\\\ }} to insert {green spaces} \n",
+        typeLabel: "\"{underline .'^<?(tuQ0mdp*#MB@}\""
+    },
+    {
+        name: "letters_per_pixel",
+        alias: "w",
+        defaultValue: 1,
+        type: Number,
+        typeLabel: "{underline int}",
+        description: "How many {green letters} used {green per Pixel} \n Recommended to set it greater than 1 when higher than wide \n"
+    },
+    {
+        name: "log",
+        alias: "l",
+        type: Boolean,
+        description: "Logs some {green data} of the bitmap"
+    }
 ];
-
-const options = commandLineArgs(optionDefinitions);
-
-
+var options = commandLineArgs(optionDefinitions);
 // -h
-const banner = String.raw`
-    ___  ________  ___  __    ________  ________  ___     
-   |\  \|\   __  \|\  \|\  \ |\   __  \|\   __  \|\  \    
-   \ \  \ \  \|\  \ \  \/  /|\ \  \|\  \ \  \|\ /\ \  \   
- __ \ \  \ \   __  \ \   ___  \ \   __  \ \   __  \ \  \  
-|\  \\_\  \ \  \ \  \ \  \\ \  \ \  \ \  \ \  \|\  \ \  \ 
-\ \________\ \__\ \__\ \__\\ \__\ \__\ \__\ \_______\ \__\
- \|________|\|__|\|__|\|__| \|__|\|__|\|__|\|_______|\|__|                                             
-
-`.replaceAll("\\", "\\\\")
-
+var banner = String.raw(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n    ___  ________  ___  __    ________  ________  ___     \n   |  |   __  |  |   |   __  |   __  |      \n         |     /  /|   |     | /      \n __        __      ___      __      __       \n|  \\_           \\            |      \n ________ __ __ __\\ __ __ __ _______ __ |________||__||__||__| |__||__||__||_______||__|                                             \n\n"], ["\n    ___  ________  ___  __    ________  ________  ___     \n   |\\  \\|\\   __  \\|\\  \\|\\  \\ |\\   __  \\|\\   __  \\|\\  \\    \n   \\ \\  \\ \\  \\|\\  \\ \\  \\/  /|\\ \\  \\|\\  \\ \\  \\|\\ /\\ \\  \\   \n __ \\ \\  \\ \\   __  \\ \\   ___  \\ \\   __  \\ \\   __  \\ \\  \\  \n|\\  \\\\_\\  \\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\  \\ \\  \\ \\  \\|\\  \\ \\  \\ \n\\ \\________\\ \\__\\ \\__\\ \\__\\\\ \\__\\ \\__\\ \\__\\ \\_______\\ \\__\\\n \\|________|\\|__|\\|__|\\|__| \\|__|\\|__|\\|__|\\|_______|\\|__|                                             \n\n"])));
+console.log(banner.replace("\\", "\\\\"));
 //the usage guide when flag -h/--help
-const createDescription = () => (
-  {
+var createDescription = function () { return ({
     usage: commandLineUsage([
-      {
-        header: "Ascii_Art",
-        content: [
-          "Generates an img out of ascci characters (-text file) from a {green bmp file}.",
-          "Do use a {green MONOSPACE text font} to make sure the characters width is alway's the same.",
-          "",
-          "Try to keep the image size {red under 500:500 px (recommendet 100 - 200 px)}."
-        ]
-      },
-      {
-        header: "Options",
-        optionList: optionDefinitions
-      },
-      {
-        content: banner,
-        raw: true
-      },
-      {
-        content: "Project home: {blue {underline https://github.com/Jakabi107/ImgToAscci-CLI}} \nAuthors: Jakabi",
-      }
+        {
+            header: "Ascii_Art",
+            content: [
+                "Generates an img out of ascci characters (-text file) from a {green bmp file}.",
+                "Do use a {green MONOSPACE text font} to make sure the characters width is alway's the same.",
+                "",
+                "Try to keep the image size {red under 500:500 px (recommendet 100 - 200 px)}."
+            ]
+        },
+        {
+            header: "Options",
+            optionList: optionDefinitions
+        },
+        {
+            content: banner,
+            raw: true
+        },
+        {
+            content: "Project home: {blue {underline https://github.com/Jakabi107/ImgToAscci-CLI}} \nAuthors: Jakabi",
+        }
     ]),
-
-    logo: String.raw`
-
-     ___  ________  ___  __    ________  ________  ___     
-    |\  \|\   __  \|\  \|\  \ |\   __  \|\   __  \|\  \    
-    \ \  \ \  \|\  \ \  \/  /|\ \  \|\  \ \  \|\ /\ \  \   
- __  \ \  \ \   __  \ \   ___  \ \   __  \ \   __  \ \  \  
- |\  \\_\  \ \  \ \  \ \  \\ \  \ \  \ \  \ \  \|\  \ \  \ 
- \ \________\ \__\ \__\ \__\\ \__\ \__\ \__\ \_______\ \__\
-  \|________|\|__|\|__|\|__| \|__|\|__|\|__|\|_______|\|__|                                             
-
-`
-  }
-)
-
+    logo: String.raw(templateObject_2 || (templateObject_2 = __makeTemplateObject(["\n\n     ___  ________  ___  __    ________  ________  ___     \n    |  |   __  |  |   |   __  |   __  |      \n          |     /  /|   |     | /      \n __         __      ___      __      __       \n |  \\_           \\            |      \n  ________ __ __ __\\ __ __ __ _______ __  |________||__||__||__| |__||__||__||_______||__|                                             \n\n"], ["\n\n     ___  ________  ___  __    ________  ________  ___     \n    |\\  \\|\\   __  \\|\\  \\|\\  \\ |\\   __  \\|\\   __  \\|\\  \\    \n    \\ \\  \\ \\  \\|\\  \\ \\  \\/  /|\\ \\  \\|\\  \\ \\  \\|\\ /\\ \\  \\   \n __  \\ \\  \\ \\   __  \\ \\   ___  \\ \\   __  \\ \\   __  \\ \\  \\  \n |\\  \\\\_\\  \\ \\  \\ \\  \\ \\  \\\\ \\  \\ \\  \\ \\  \\ \\  \\|\\  \\ \\  \\ \n \\ \\________\\ \\__\\ \\__\\ \\__\\\\ \\__\\ \\__\\ \\__\\ \\_______\\ \\__\\\n  \\|________|\\|__|\\|__|\\|__| \\|__|\\|__|\\|__|\\|_______|\\|__|                                             \n\n"])))
+}); };
 if (options.help) {
-  let description = createDescription();
-  console.log(description.usage)
-  return 0
+    var description = createDescription();
+    console.log(description.usage);
+    process.exit(0);
 }
-
-
-
-
-function main(options){
-
-  let data = readData(options);
-  let output = processData(options, data);
-
-  //stdout
-  if (options.out) fs.writeFile(options.out, output.result, "ascii", (err) => {
-    if (err) throw err;
-    process.stdout.write(options.out);
-  })
-  else process.stdout.write(output.result);
-}
-
-
-class dataOutput {
-  buffer;
-  isFile = false;
-  isBmp = false;
-}
-
-function readData(options){
-  let output = new dataOutput();
-  
-  if (fs.existsSync(options.file)) {
-    output.buffer = fs.readFileSync(options.file);
-    output.isFile = true;
-  } 
-  else if (options.file){
-    //pure data from -f
-    output.buffer = new Buffer.from(options.file);
-  } 
-  else if (options.data){
-    //pure data from -d
-    output.buffer = new Buffer.from(options.data);
-  }
-  else{
-    throw new Error("\x1b[4m\x1b[31mInputed data is not valid\x1b[0m");
-  }
-
-  //check if BMP
-  output.isBmp = (output.buffer.toString("ascii", 0, 2) == "BM")
-
-
-  return output;
-}
-
-
-class processedOutput {
-  result;
-}
-
-function processData(options, data){
-
-  let output = new processedOutput();
-
-  if (data.isBmp){
-    output.result = filter.ascciArtFromFile(data.buffer, options.pallete, options.letters_per_pixel, options.log).join("\n");
-  }
-  else if (data.isFile){
-    //Note: convert
-    throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m")
-  }
-  else {
-    output.result = filter.ascciArtFromLine(data.buffer, options.pallete, options.letters_per_pixel);
-  }
-
-  return output
-}
-
-
-if (!options.file && !options.data) process.stdin.on("data", data => {
-  options.file = data.toString();
-  console.log(fs.existsSync(options.file))
-  main(options)
-})
-else main(options);
+var Data = /** @class */ (function () {
+    function Data(options) {
+        this.options = options;
+        this._raw = this.readData();
+        this._out = this.toString();
+    }
+    Object.defineProperty(Data.prototype, "raw", {
+        get: function () {
+            return this._raw;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Data.prototype, "out", {
+        get: function () {
+            return this._out;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Data.prototype.printOut = function () {
+        if (options.out)
+            fs.writeFile(options.out, this._out.result.toString(), "ascii", function (err) {
+                if (err)
+                    throw err;
+                process.stdout.write(options.out);
+            });
+        else
+            process.stdout.write(this._out.result.toString());
+    };
+    Data.prototype.readData = function () {
+        var output = {};
+        if (fs.existsSync(this.options.file)) {
+            output.buffer = fs.readFileSync(this.options.file);
+            output.isFile = true;
+        }
+        else if (this.options.file) {
+            //pure data from -f
+            output.buffer = buffer_1.Buffer.from(this.options.file);
+        }
+        else if (this.options.data) {
+            //pure data from -d
+            output.buffer = buffer_1.Buffer.from(this.options.data);
+        }
+        else {
+            throw new Error("\x1b[4m\x1b[31mInputed data is not valid\x1b[0m");
+        }
+        //check if BMP
+        output.isBmp = (output.buffer.toString("ascii", 0, 2) == "BM");
+        return output;
+    };
+    Data.prototype.toString = function () {
+        var output = { result: "" };
+        if (this._raw.isBmp) {
+            output.result = filter.ascciArtFromFile(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel, this.options.log).join("\n");
+        }
+        else if (this._raw.isFile) {
+            //Note: convert
+            throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m");
+        }
+        else {
+            output.result = filter.ascciArtFromLine(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel);
+        }
+        return output;
+    };
+    return Data;
+}());
+new Data(options).printOut();
+var templateObject_1, templateObject_2;
+// if (!options.file && !options.data) process.stdin.on("data", data => {
+//   options.file = data.toString();
+//   console.log(fs.existsSync(options.file))
+//   main(options)
+// })
+// else main(options);

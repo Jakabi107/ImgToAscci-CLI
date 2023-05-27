@@ -15,8 +15,14 @@
   "author": "Jakabi107",
   "license": "ISC",
   "dependencies": {
+    "@types/command-line-args": "^5.2.0",
+    "@types/command-line-usage": "^5.0.2",
     "command-line-args": "^5.2.1",
     "command-line-usage": "^7.0.1",
+    "typescript": "^5.0.4",
     "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.5"
   }
 }
