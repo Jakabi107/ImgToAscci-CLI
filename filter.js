@@ -9,16 +9,24 @@ var Main = /** @class */ (function () {
             height: 1
         };
         this._rawBmp = this.input.bf;
+        this._pixelMap = this.getPixelMap();
     }
     Object.defineProperty(Main.prototype, "data", {
         get: function () {
-            return this.data;
+            return this._data;
         },
         enumerable: false,
         configurable: true
     });
-    // ---
-    Main.prototype.getBitmapSorted = function () {
+    Object.defineProperty(Main.prototype, "pixelMap", {
+        get: function () {
+            return this._pixelMap;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    // --- 
+    Main.prototype.getPixelMap = function () {
         var _this = this;
         var getPixel = function (i) {
             var rawPix = _this._rawBmp.subarray(i * 4, (i + 1) * 4);
@@ -30,11 +38,11 @@ var Main = /** @class */ (function () {
             };
         };
         var row = [getPixel(0)];
-        var bitmapRGBA = [row];
+        var pixelMap = [row];
         for (var i = 1; i < this._rawBmp.length / 4; i++) {
             var pixel = getPixel(i);
             if (i % this._data.width == 0) {
-                bitmapRGBA[Math.floor(i / this._data.width)] = row;
+                pixelMap[Math.floor(i / this._data.width)] = row;
                 row = [pixel];
             }
             else {
@@ -42,7 +50,25 @@ var Main = /** @class */ (function () {
             }
         }
         ;
-        return bitmapRGBA;
+        return pixelMap;
+    };
+    Main.prototype.pixelMapToTextArr = function (palette, lettersPerPixel) {
+        var _this = this;
+        return this._pixelMap.map(function (row) {
+            return row.map(function (pixel) {
+                return _this.brightnessToLetter(_this.pixelBrightness(pixel), palette);
+            });
+        });
+    };
+    Main.prototype.pixelBrightness = function (pixel) {
+        //return (pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722);
+        return (pixel.r + pixel.g + pixel.b) / 3;
+    };
+    Main.prototype.brightnessToLetter = function (brightness, pallate) {
+        var pos = Math.floor(brightness / (255 / pallate.length));
+        if (pos == pallate.length)
+            pos--;
+        return pallate[pos];
     };
     return Main;
 }());
@@ -62,7 +88,7 @@ function ascciArtFromLine(bf, pallatte, lettersPerPixel) {
     //     width:number.POSITIVE_INFINITY,
     //     height:1
     // };
-    var bitmapRGBA = getBitmapSorted(bf, data);
+    //let bitmapRGBA = getBitmapSorted(bf, data);
     return bitmapRGBAToText(bitmapRGBA, pallatte, lettersPerPixel)[0];
 }
 function getBitmap(bf, data) {
@@ -71,36 +97,10 @@ function getBitmap(bf, data) {
 function bitmapRGBAToText(bitmapRGBA, pallate, lettersPerPixel) {
     var highest = -1;
     var lowest = 256;
-    var brightMap = bitmapRGBA.map(function (row) {
-        return row.map(function (pixel) {
-            var pixelBright = pixelBrightness(pixel);
-            if (pixelBright > highest)
-                highest = pixelBright;
-            else if (pixelBright < lowest)
-                lowest = pixelBright;
-            return pixelBright;
-        });
-    });
     var range = (highest - lowest) / pallate.length;
     //remove for fit range
     range = 255 / pallate.length;
     lowest = 0;
-    return brightMap.map(function (row) {
-        return row.map(function (pixelBr) {
-            var letter = brightToLetter(pixelBr, range, lowest, pallate);
-            return Array(lettersPerPixel).fill(letter).join("");
-        }).join("");
-    });
-}
-function pixelBrightness(pixel) {
-    //return (pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722);
-    return (pixel.r + pixel.g + pixel.b) / 3;
-}
-function brightToLetter(brightness, range, base, pallate) {
-    var pos = Math.floor((brightness - base) / range);
-    if (pos == pallate.length)
-        pos = pallate.length - 1;
-    return pallate[pos];
 }
 exports.default = {
     ascciArtFromFile: ascciArtFromFile,

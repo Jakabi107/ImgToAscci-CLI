@@ -18,7 +18,7 @@ interface PixelFormat {
 
 interface Input {
     bf: Buffer;
-    pallate: string;
+    palette: string;
     lettersPerPixel:number;
 }
 
@@ -36,15 +36,25 @@ class Main {
     }
 
     get data ():DataFormat{
-        return this.data;
+        return this._data;
     }
 
-    private _rawBmp = this.input.bf;
+    private _rawBmp:Buffer = this.input.bf;
 
 
+    private _pixelMap:PixelFormat[][] = this.getPixelMap();
 
-    // ---
-    private getBitmapSorted(){
+    get pixelMap () {
+        return this._pixelMap;
+    }
+
+    get string () {
+        return this.toString();
+    }
+
+
+    // --- 
+    private getPixelMap():PixelFormat[][] {
 
         let getPixel = (i):PixelFormat =>{
             let rawPix = this._rawBmp.subarray(i*4, (i+1)*4);
@@ -57,24 +67,50 @@ class Main {
             };
         };
 
-        let row:[PixelFormat] = [getPixel(0)];
-        let bitmapRGBA:[[PixelFormat]] = [row];
+        let pixelMap:PixelFormat[][] = [];
 
-        
         for(let i = 1; i < this._rawBmp.length/4; i++) {
+            if (i % this._data.width == 0) pixelMap.push([]);
 
-            let pixel = getPixel(i);
-
-            if (i % this._data.width == 0){
-                bitmapRGBA[Math.floor(i / this._data.width)] = row;
-                row = [pixel];
-            }  
-            else {
-                row.push(pixel);
-            }
+            pixelMap[pixelMap.length - 1].push(getPixel(i));
         };
     
-        return bitmapRGBA;
+        return pixelMap;
+    }
+
+
+    public pixelMapToTextArr(palette:string = this.input.palette):string[][]{
+
+        return this._pixelMap.map(row => {
+            return row.map(pixel => {
+                return this.brightnessToLetter(this.pixelBrightness(pixel), palette);
+            });
+        });
+
+    }
+
+
+    public toString(palette:string = this.input.palette, lettersPerPixel:number = this.input.lettersPerPixel):string {
+
+        return this._pixelMap.map(row => {
+            row.map(letter => {
+                return Array(lettersPerPixel).fill(letter).join("");
+            }).join("");
+        }).join("\n");
+
+    }
+
+    
+    public pixelBrightness (pixel:PixelFormat):number {
+        //return (pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722);
+        return (pixel.r + pixel.g + pixel.b)/3;
+    }
+
+
+    public brightnessToLetter(brightness:number, palette:string):string {
+        let pos:number = Math.floor( brightness / (255 / palette.length) );
+        if (pos == palette.length) pos --;
+        return palette[pos];
     }
 
     // private getBmpData():BmpDataFormat {
@@ -111,7 +147,7 @@ function ascciArtFromLine (bf, pallatte, lettersPerPixel){
     //     height:1
     // };
 
-    let bitmapRGBA = getBitmapSorted(bf, data);
+    //let bitmapRGBA = getBitmapSorted(bf, data);
     return bitmapRGBAToText(bitmapRGBA, pallatte, lettersPerPixel)[0];
 }
 
@@ -127,14 +163,7 @@ function bitmapRGBAToText(bitmapRGBA, pallate, lettersPerPixel){
     let highest = -1;
     let lowest = 256;
 
-    let brightMap = bitmapRGBA.map(row => {
-        return row.map(pixel => {
-            let pixelBright = pixelBrightness(pixel);
-            if (pixelBright > highest) highest = pixelBright;
-            else if (pixelBright < lowest) lowest = pixelBright;
-            return pixelBright;
-        });
-    });
+
 
     let range = (highest - lowest)/pallate.length;
 
@@ -143,26 +172,9 @@ function bitmapRGBAToText(bitmapRGBA, pallate, lettersPerPixel){
     range = 255/pallate.length;
     lowest = 0;
 
-    return brightMap.map(row =>{
-        return row.map(pixelBr => {
-            let letter = brightToLetter(pixelBr, range, lowest, pallate);
-            return Array(lettersPerPixel).fill(letter).join("");
-        }).join("");
-    });
+    
 }
 
-
-function pixelBrightness (pixel) {
-    //return (pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722);
-    return (pixel.r + pixel.g + pixel.b)/3;
-}
-
-
-function brightToLetter(brightness, range, base, pallate){
-    let pos = Math.floor((brightness - base) / range);
-    if (pos == pallate.length) pos = pallate.length -1;
-    return pallate[pos]
-}
 
 
 export default {
