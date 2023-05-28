@@ -16,21 +16,24 @@ interface PixelFormat {
 }
 
 
-interface Input {
+export interface Input {
     bf: Buffer;
     palette: string;
     lettersPerPixel:number;
 }
 
 
-class Main {
+export class Line {
     
-    constructor (private input:Input) {
-    
+    constructor (protected input:Input) {
+        
+        this._rawBmp = input.bf;
+        this._pixelMap = this.getPixelMap();
+        this._string = this.toString();
     }
 
     //varibles
-    private _data:DataFormat = {
+    protected _data:DataFormat = {
         width:Number.POSITIVE_INFINITY,
         height:1
     }
@@ -39,17 +42,19 @@ class Main {
         return this._data;
     }
 
-    private _rawBmp:Buffer = this.input.bf;
+    protected _rawBmp:Buffer;
 
 
-    private _pixelMap:PixelFormat[][] = this.getPixelMap();
+    private _pixelMap:PixelFormat[][];
 
     get pixelMap () {
         return this._pixelMap;
     }
 
+    private _string:string;
+
     get string () {
-        return this.toString();
+        return this._string;
     }
 
 
@@ -101,83 +106,45 @@ class Main {
     }
 
     
-    public pixelBrightness (pixel:PixelFormat):number {
+    private pixelBrightness (pixel:PixelFormat):number {
         //return (pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722);
         return (pixel.r + pixel.g + pixel.b)/3;
     }
 
 
-    public brightnessToLetter(brightness:number, palette:string):string {
+    private brightnessToLetter(brightness:number, palette:string):string {
         let pos:number = Math.floor( brightness / (255 / palette.length) );
         if (pos == palette.length) pos --;
         return palette[pos];
     }
 
-    // private getBmpData():BmpDataFormat {
-
-    //     return {
-    //         fSize: this.input.bf.readInt32LE(2),
-    //         dataOffset: this.input.bf.readInt32LE(10),
-    //         width: this.input.bf.readInt32LE(18),
-    //         height: Math.abs(this.input.bf.readInt32LE(22)),
-    //         bitsPerPixel: Math.abs(this.input.bf.readInt32LE(28)),
-    //         bmSize: this.input.bf.readUInt32LE(34)
-    //     } 
-    // }
-
-
 }
 
 
-function ascciArtFromFile (bf, palatte, lettersPerPixel, log = false){
-
-    let data = getBmpData(bf);
-    if (log) console.log("Bit-Format: " + data.bitsPerPixel + "-bit");
-    let bitmap = getBitmap(bf, data);
-    let bitmapRGBA = getBitmapSorted(bitmap, data);
-    if (log) console.log(data);
-    return bitmapRGBAToText(bitmapRGBA, palatte, lettersPerPixel);
-}
-
-
-function ascciArtFromLine (bf, pallatte, lettersPerPixel){
-
-    // let data = {
-    //     width:number.POSITIVE_INFINITY,
-    //     height:1
-    // };
-
-    //let bitmapRGBA = getBitmapSorted(bf, data);
-    return bitmapRGBAToText(bitmapRGBA, pallatte, lettersPerPixel)[0];
-}
-
-
-function getBitmap (bf, data) {
-    return bf.subarray(data.dataOffset);
-}
-
-
-
-function bitmapRGBAToText(bitmapRGBA, pallate, lettersPerPixel){
-
-    let highest = -1;
-    let lowest = 256;
-
-
-
-    let range = (highest - lowest)/pallate.length;
-
-
-    //remove for fit range
-    range = 255/pallate.length;
-    lowest = 0;
-
+export class File extends Line {
     
-}
+    constructor (input:Input){
+        super(input);
+        this._data = this.getBmpData();
+        this._rawBmp = this.getRaw();
+    }
+    
+
+    private getBmpData():DataFormat {
+
+        return {
+            fSize: this.input.bf.readInt32LE(2),
+            dataOffset: this.input.bf.readInt32LE(10),
+            width: this.input.bf.readInt32LE(18),
+            height: Math.abs(this.input.bf.readInt32LE(22)),
+            bitsPerPixel: Math.abs(this.input.bf.readInt32LE(28)),
+            bmSize: this.input.bf.readUInt32LE(34)
+        } 
+    }
 
 
+    private getRaw ():Buffer {
+        return this.input.bf.subarray(this._data.dataOffset);
+    }
 
-export default {
-    ascciArtFromFile: ascciArtFromFile,
-    ascciArtFromLine: ascciArtFromLine
 }
