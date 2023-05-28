@@ -113,15 +113,22 @@ interface RawFormat {
 
 class Data {
 
-  private _raw:RawFormat = this.readData();
+  
+  constructor(private options:commandLineArgs.CommandLineOptions){
+    this._rawData = this.readData();
+    this._out = this.toString();
+  }
 
-  get raw () {
-    return this._raw;
+
+  private _rawData:RawFormat;
+
+  get rawData ():RawFormat {
+    return this._rawData;
   } 
 
-  private _out:{result:string} = this.toString();
+  private _out:{result:string};
 
-  get out () {
+  get out ():{result:string} {
     return this._out;
   }
 
@@ -137,12 +144,7 @@ class Data {
   }
 
 
-  constructor(private options:commandLineArgs.CommandLineOptions){
-  }
-  
-  
-
-  public readData():RawFormat {
+  private readData():RawFormat {
 
     let output:RawFormat = {
       buffer: Buffer.prototype,
@@ -170,22 +172,22 @@ class Data {
   }
 
 
-  public toString():{result:string}{
+  public toString(palette?:string, lettersPerPixel?:number):{result:string}{
 
     let input:filter.Input = {
-      bf: this._raw.buffer,
-      palette: this.options.pallete,
-      lettersPerPixel: this.options.lettersPerPixel
+      bf: this._rawData.buffer,
+      palette: palette? palette : this.options.pallete,
+      lettersPerPixel: lettersPerPixel? lettersPerPixel : this.options.lettersPerPixel
     }
 
     let output = {result:""};
 
-    if (this._raw.isBmp){
+    if (this._rawData.isBmp){
       let file:filter.File = new filter.File(input);
       if (this.options.log) console.log(file.data);
       output.result = file.string;
     }
-    else if (this._raw.isFile){
+    else if (this._rawData.isFile){
       //Note: convert
       throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m")
     }
@@ -201,9 +203,11 @@ class Data {
 }
 
 
-var mainD = new Data(options);
+var mainData = new Data(options);
 
-mainD.printOut();
+mainData.printOut();
+
+
 
 
 // if (!options.file && !options.data) process.stdin.on("data", data => {
