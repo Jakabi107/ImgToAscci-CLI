@@ -92,12 +92,12 @@ if (options.help) {
 var Data = /** @class */ (function () {
     function Data(options) {
         this.options = options;
-        this._raw = this.readData();
+        this._rawData = this.readData();
         this._out = this.toString();
     }
-    Object.defineProperty(Data.prototype, "raw", {
+    Object.defineProperty(Data.prototype, "rawData", {
         get: function () {
-            return this._raw;
+            return this._rawData;
         },
         enumerable: false,
         configurable: true
@@ -140,20 +140,20 @@ var Data = /** @class */ (function () {
         output.isBmp = (output.buffer.toString("ascii", 0, 2) == "BM");
         return output;
     };
-    Data.prototype.toString = function () {
+    Data.prototype.toString = function (palette, lettersPerPixel) {
         var input = {
-            bf: this._raw.buffer,
-            palette: this.options.pallete,
-            lettersPerPixel: this.options.lettersPerPixel
+            bf: this._rawData.buffer,
+            palette: palette ? palette : this.options.pallete,
+            lettersPerPixel: lettersPerPixel ? lettersPerPixel : this.options.lettersPerPixel
         };
         var output = { result: "" };
-        if (this._raw.isBmp) {
+        if (this._rawData.isBmp) {
             var file = new filter.File(input);
             if (this.options.log)
                 console.log(file.data);
             output.result = file.string;
         }
-        else if (this._raw.isFile) {
+        else if (this._rawData.isFile) {
             //Note: convert
             throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m");
         }
@@ -165,8 +165,8 @@ var Data = /** @class */ (function () {
     };
     return Data;
 }());
-var mainD = new Data(options);
-mainD.printOut();
+var mainData = new Data(options);
+mainData.printOut();
 var templateObject_1;
 // if (!options.file && !options.data) process.stdin.on("data", data => {
 //   options.file = data.toString();
