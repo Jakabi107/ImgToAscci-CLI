@@ -42,7 +42,7 @@ var optionDefinitions = [
         typeLabel: "\"{underline .'^<?(tuQ0mdp*#MB@}\""
     },
     {
-        name: "letters_per_pixel",
+        name: "lettersPerPixel",
         alias: "w",
         defaultValue: 1,
         type: Number,
@@ -120,14 +120,14 @@ var Data = /** @class */ (function () {
             process.stdout.write(this._out.result.toString());
     };
     Data.prototype.readData = function () {
-        var output = {};
+        var output = {
+            buffer: buffer_1.Buffer.prototype,
+            isFile: false,
+            isBmp: false
+        };
         if (fs.existsSync(this.options.file)) {
             output.buffer = fs.readFileSync(this.options.file);
             output.isFile = true;
-        }
-        else if (this.options.file) {
-            //pure data from -f
-            output.buffer = buffer_1.Buffer.from(this.options.file);
         }
         else if (this.options.data) {
             //pure data from -d
@@ -141,16 +141,23 @@ var Data = /** @class */ (function () {
         return output;
     };
     Data.prototype.toString = function () {
+        var input = {
+            bf: this._raw.buffer,
+            palette: this.options.pallete,
+            lettersPerPixel: this.options.lettersPerPixel
+        };
         var output = { result: "" };
         if (this._raw.isBmp) {
-            output.result = filter.default.ascciArtFromFile(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel, this.options.log).join("\n");
+            var file = new filter.File(input);
+            output.result = file.string;
         }
         else if (this._raw.isFile) {
             //Note: convert
             throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m");
         }
         else {
-            output.result = filter.default.ascciArtFromLine(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel);
+            var line = new filter.Line(input);
+            output.result = line.string;
         }
         return output;
     };

@@ -28,8 +28,6 @@ export class Line {
     constructor (protected input:Input) {
         
         this._rawBmp = input.bf;
-        this._pixelMap = this.getPixelMap();
-        this._string = this.toString();
     }
 
     //varibles
@@ -38,23 +36,19 @@ export class Line {
         height:1
     }
 
-    get data ():DataFormat{
+    get data ():DataFormat { 
         return this._data;
     }
 
     protected _rawBmp:Buffer;
 
-
-    private _pixelMap:PixelFormat[][];
-
-    get pixelMap () {
-        return this._pixelMap;
+    get pixelMap ():PixelFormat[][] {
+        return this.getPixelMap();
     }
 
-    private _string:string;
 
-    get string () {
-        return this._string;
+    get string ():string {
+        return this.toString();
     }
 
 
@@ -74,7 +68,7 @@ export class Line {
 
         let pixelMap:PixelFormat[][] = [];
 
-        for(let i = 1; i < this._rawBmp.length/4; i++) {
+        for(let i = 0; i < this._rawBmp.length/4; i++) {
             if (i % this._data.width == 0) pixelMap.push([]);
 
             pixelMap[pixelMap.length - 1].push(getPixel(i));
@@ -84,9 +78,9 @@ export class Line {
     }
 
 
-    public pixelMapToTextArr(palette:string = this.input.palette):string[][]{
+    public toTextArr(palette:string = this.input.palette):string[][]{
 
-        return this._pixelMap.map(row => {
+        return this.pixelMap.map(row => {
             return row.map(pixel => {
                 return this.brightnessToLetter(this.pixelBrightness(pixel), palette);
             });
@@ -97,8 +91,8 @@ export class Line {
 
     public toString(palette:string = this.input.palette, lettersPerPixel:number = this.input.lettersPerPixel):string {
 
-        return this._pixelMap.map(row => {
-            row.map(letter => {
+        return this.toTextArr().map(row => {
+            return row.map(letter => {
                 return Array(lettersPerPixel).fill(letter).join("");
             }).join("");
         }).join("\n");
@@ -128,7 +122,6 @@ export class File extends Line {
         this._data = this.getBmpData();
         this._rawBmp = this.getRaw();
     }
-    
 
     private getBmpData():DataFormat {
 

@@ -1,32 +1,54 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Main = /** @class */ (function () {
-    function Main(input) {
+exports.File = exports.Line = void 0;
+var Line = /** @class */ (function () {
+    function Line(input) {
         this.input = input;
         //varibles
         this._data = {
             width: Number.POSITIVE_INFINITY,
             height: 1
         };
-        this._rawBmp = this.input.bf;
-        this._pixelMap = this.getPixelMap();
+        this._rawBmp = input.bf;
     }
-    Object.defineProperty(Main.prototype, "data", {
+    Object.defineProperty(Line.prototype, "data", {
         get: function () {
             return this._data;
         },
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(Main.prototype, "pixelMap", {
+    Object.defineProperty(Line.prototype, "pixelMap", {
         get: function () {
-            return this._pixelMap;
+            return this.getPixelMap();
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(Line.prototype, "string", {
+        get: function () {
+            return this.toString();
         },
         enumerable: false,
         configurable: true
     });
     // --- 
-    Main.prototype.getPixelMap = function () {
+    Line.prototype.getPixelMap = function () {
         var _this = this;
         var getPixel = function (i) {
             var rawPix = _this._rawBmp.subarray(i * 4, (i + 1) * 4);
@@ -37,72 +59,67 @@ var Main = /** @class */ (function () {
                 alpha: rawPix.readUInt8(3)
             };
         };
-        var row = [getPixel(0)];
-        var pixelMap = [row];
-        for (var i = 1; i < this._rawBmp.length / 4; i++) {
-            var pixel = getPixel(i);
-            if (i % this._data.width == 0) {
-                pixelMap[Math.floor(i / this._data.width)] = row;
-                row = [pixel];
-            }
-            else {
-                row.push(pixel);
-            }
+        var pixelMap = [];
+        for (var i = 0; i < this._rawBmp.length / 4; i++) {
+            if (i % this._data.width == 0)
+                pixelMap.push([]);
+            pixelMap[pixelMap.length - 1].push(getPixel(i));
         }
         ;
         return pixelMap;
     };
-    Main.prototype.pixelMapToTextArr = function (palette, lettersPerPixel) {
+    Line.prototype.toTextArr = function (palette) {
         var _this = this;
-        return this._pixelMap.map(function (row) {
+        if (palette === void 0) { palette = this.input.palette; }
+        return this.pixelMap.map(function (row) {
             return row.map(function (pixel) {
                 return _this.brightnessToLetter(_this.pixelBrightness(pixel), palette);
             });
         });
     };
-    Main.prototype.pixelBrightness = function (pixel) {
+    Line.prototype.toString = function (palette, lettersPerPixel) {
+        if (palette === void 0) { palette = this.input.palette; }
+        if (lettersPerPixel === void 0) { lettersPerPixel = this.input.lettersPerPixel; }
+        return this.toTextArr().map(function (row) {
+            return row.map(function (letter) {
+                return Array(lettersPerPixel).fill(letter).join("");
+            }).join("");
+        }).join("\n");
+    };
+    Line.prototype.pixelBrightness = function (pixel) {
         //return (pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722);
         return (pixel.r + pixel.g + pixel.b) / 3;
     };
-    Main.prototype.brightnessToLetter = function (brightness, pallate) {
-        var pos = Math.floor(brightness / (255 / pallate.length));
-        if (pos == pallate.length)
+    Line.prototype.brightnessToLetter = function (brightness, palette) {
+        var pos = Math.floor(brightness / (255 / palette.length));
+        if (pos == palette.length)
             pos--;
-        return pallate[pos];
+        return palette[pos];
     };
-    return Main;
+    return Line;
 }());
-function ascciArtFromFile(bf, palatte, lettersPerPixel, log) {
-    if (log === void 0) { log = false; }
-    var data = getBmpData(bf);
-    if (log)
-        console.log("Bit-Format: " + data.bitsPerPixel + "-bit");
-    var bitmap = getBitmap(bf, data);
-    var bitmapRGBA = getBitmapSorted(bitmap, data);
-    if (log)
-        console.log(data);
-    return bitmapRGBAToText(bitmapRGBA, palatte, lettersPerPixel);
-}
-function ascciArtFromLine(bf, pallatte, lettersPerPixel) {
-    // let data = {
-    //     width:number.POSITIVE_INFINITY,
-    //     height:1
-    // };
-    //let bitmapRGBA = getBitmapSorted(bf, data);
-    return bitmapRGBAToText(bitmapRGBA, pallatte, lettersPerPixel)[0];
-}
-function getBitmap(bf, data) {
-    return bf.subarray(data.dataOffset);
-}
-function bitmapRGBAToText(bitmapRGBA, pallate, lettersPerPixel) {
-    var highest = -1;
-    var lowest = 256;
-    var range = (highest - lowest) / pallate.length;
-    //remove for fit range
-    range = 255 / pallate.length;
-    lowest = 0;
-}
-exports.default = {
-    ascciArtFromFile: ascciArtFromFile,
-    ascciArtFromLine: ascciArtFromLine
-};
+exports.Line = Line;
+var File = /** @class */ (function (_super) {
+    __extends(File, _super);
+    function File(input) {
+        var _this = _super.call(this, input) || this;
+        _this._data = _this.getBmpData();
+        _this._rawBmp = _this.getRaw();
+        return _this;
+    }
+    File.prototype.getBmpData = function () {
+        return {
+            fSize: this.input.bf.readInt32LE(2),
+            dataOffset: this.input.bf.readInt32LE(10),
+            width: this.input.bf.readInt32LE(18),
+            height: Math.abs(this.input.bf.readInt32LE(22)),
+            bitsPerPixel: Math.abs(this.input.bf.readInt32LE(28)),
+            bmSize: this.input.bf.readUInt32LE(34)
+        };
+    };
+    File.prototype.getRaw = function () {
+        return this.input.bf.subarray(this._data.dataOffset);
+    };
+    return File;
+}(Line));
+exports.File = File;

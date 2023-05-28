@@ -38,7 +38,7 @@ const optionDefinitions = [
     typeLabel: "\"{underline .'^<?(tuQ0mdp*#MB@}\""
   },
   {
-    name: "letters_per_pixel",
+    name: "lettersPerPixel",
     alias: "w",
     defaultValue: 1,
     type: Number,
@@ -105,9 +105,9 @@ if (options.help) {
 
 
 interface RawFormat {
-  buffer?:Buffer;
-  isFile?:Boolean;
-  isBmp?:Boolean;
+  buffer:Buffer;
+  isFile:Boolean;
+  isBmp:Boolean;
 }
 
 
@@ -144,16 +144,16 @@ class Data {
 
   public readData():RawFormat {
 
-    let output:RawFormat = {};
+    let output:RawFormat = {
+      buffer: Buffer.prototype,
+      isFile:false,
+      isBmp:false
+    };
 
     if (fs.existsSync(this.options.file)) {
       output.buffer = fs.readFileSync(this.options.file);
       output.isFile = true;
-    } 
-    else if (this.options.file){
-      //pure data from -f
-      output.buffer = Buffer.from(this.options.file);
-    } 
+    }
     else if (this.options.data){
       //pure data from -d
       output.buffer = Buffer.from(this.options.data);
@@ -172,17 +172,25 @@ class Data {
 
   public toString():{result:string}{
 
+    let input:filter.Input = {
+      bf: this._raw.buffer,
+      palette: this.options.pallete,
+      lettersPerPixel: this.options.lettersPerPixel
+    }
+
     let output = {result:""};
-  
+
     if (this._raw.isBmp){
-      output.result = filter.default.ascciArtFromFile(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel, this.options.log).join("\n");
+      let file:filter.File = new filter.File(input);
+      output.result = file.string;
     }
     else if (this._raw.isFile){
       //Note: convert
       throw new Error("\x1b[4m\x1b[31mPlease input a proper bmp file\x1b[0m")
     }
     else {
-      output.result = filter.default.ascciArtFromLine(this._raw.buffer, this.options.pallete, this.options.letters_per_pixel);
+      let line:filter.Line = new filter.Line(input);
+      output.result = line.string;
     }
   
     return output
