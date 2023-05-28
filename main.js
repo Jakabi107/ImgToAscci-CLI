@@ -149,6 +149,8 @@ var Data = /** @class */ (function () {
         var output = { result: "" };
         if (this._raw.isBmp) {
             var file = new filter.File(input);
+            if (this.options.log)
+                console.log(file.data);
             output.result = file.string;
         }
         else if (this._raw.isFile) {

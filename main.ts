@@ -182,6 +182,7 @@ class Data {
 
     if (this._raw.isBmp){
       let file:filter.File = new filter.File(input);
+      if (this.options.log) console.log(file.data);
       output.result = file.string;
     }
     else if (this._raw.isFile){
