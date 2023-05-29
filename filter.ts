@@ -26,7 +26,6 @@ export interface Input {
 export class Line {
     
     constructor (protected input:Input) {
-        
         this._rawBmp = input.bf;
     }
 
@@ -42,8 +41,14 @@ export class Line {
 
     protected _rawBmp:Buffer;
 
+
     get pixelMap ():PixelFormat[][] {
         return this.getPixelMap();
+    }
+
+
+    get textArr ():string[][] {
+        return this.toTextArr();
     }
 
 
@@ -64,7 +69,7 @@ export class Line {
                 r:rawPix.readUInt8(2),
                 alpha:rawPix.readUInt8(3)
             };
-        };
+        }
 
         let pixelMap:PixelFormat[][] = [];
 
@@ -72,26 +77,26 @@ export class Line {
             if (i % this._data.width == 0) pixelMap.push([]);
 
             pixelMap[pixelMap.length - 1].push(getPixel(i));
-        };
+        }
     
         return pixelMap;
     }
 
 
-    public toTextArr(palette:string = this.input.palette):string[][]{
+    private toTextArr(palette:string = this.input.palette):string[][]{
 
         return this.pixelMap.map(row => {
             return row.map(pixel => {
                 return this.brightnessToLetter(this.pixelBrightness(pixel), palette);
-            });
-        });
+            })
+        })
 
     }
 
 
     public toString(palette:string = this.input.palette, lettersPerPixel:number = this.input.lettersPerPixel):string {
 
-        return this.toTextArr().map(row => {
+        return this.toTextArr(palette).map(row => {
             return row.map(letter => {
                 return Array(lettersPerPixel).fill(letter).join("");
             }).join("");
@@ -123,6 +128,7 @@ export class File extends Line {
         this._rawBmp = this.getRaw();
     }
 
+    
     private getBmpData():DataFormat {
 
         return {
