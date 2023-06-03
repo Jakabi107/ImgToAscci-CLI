@@ -40,6 +40,13 @@ var Line = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(Line.prototype, "textArr", {
+        get: function () {
+            return this.toTextArr();
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(Line.prototype, "string", {
         get: function () {
             return this.toString();
@@ -65,7 +72,6 @@ var Line = /** @class */ (function () {
                 pixelMap.push([]);
             pixelMap[pixelMap.length - 1].push(getPixel(i));
         }
-        ;
         return pixelMap;
     };
     Line.prototype.toTextArr = function (palette) {
@@ -80,7 +86,7 @@ var Line = /** @class */ (function () {
     Line.prototype.toString = function (palette, lettersPerPixel) {
         if (palette === void 0) { palette = this.input.palette; }
         if (lettersPerPixel === void 0) { lettersPerPixel = this.input.lettersPerPixel; }
-        return this.toTextArr().map(function (row) {
+        return this.toTextArr(palette).map(function (row) {
             return row.map(function (letter) {
                 return Array(lettersPerPixel).fill(letter).join("");
             }).join("");
